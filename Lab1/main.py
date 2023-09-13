@@ -3,6 +3,7 @@
 LAB 1
 Submission guidelines:
 
+
 A. The softcopy of the developed Python code .py must also be submitted separately. Please make
 sure the developed python code runs without any error by testing it through PyCharm software.
 The developed python code with any error will subject to 50% points penalty.
