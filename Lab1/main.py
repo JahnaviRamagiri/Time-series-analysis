@@ -17,6 +17,7 @@ E. The python file must regenerate the provided results inside the report.
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.dates as mdates
 from statsmodels.tsa.stattools import adfuller
 import os
 import utils
@@ -29,12 +30,59 @@ if __name__ == '__main__':
     df = pd.read_csv(file_path)
     print(df.head())
     utils.plot_data(df)
-    
+
     # Question 2: Find the time series statistics (average, variance, standard deviation, median) of Sales, AdBudget
     # and GPD
     utils.get_statistics(df)
 
     # Question 3: Prove that the Sales, AdBudget and GDP in this time series dataset is stationary.
+    utils.cal_rolling_mean_var(df["Sales"], "Sales")
+    utils.cal_rolling_mean_var(df["AdBudget"], "AdBudget")
+    utils.cal_rolling_mean_var(df["GDP"], "GDP")
+
+    # Question 5: Perform an ADF-test to check if the Sales, AdBudget and GDP stationary or not
+    thres = 0.95
+    utils.ADF_Cal(df["Sales"], "Sales", thres)
+    utils.ADF_Cal(df["AdBudget"], "AdBudget", thres)
+    utils.ADF_Cal(df["GDP"], "GDP", thres)
+
+    # Question 6: Perform an KPSS-test to check if the Sales, AdBudget and GDP stationary or not
+    utils.kpss_test(df["Sales"], "Sales", thres)
+    utils.kpss_test(df["AdBudget"], "AdBudget", thres)
+    utils.kpss_test(df["GDP"], "GDP", thres)
+
+    # Question 7: "AirPassengers.csv
+    file_path = utils.get_file_path("AirPassengers.csv")
+    df = pd.read_csv(file_path)
+    print(df.head())
+    df["Month"] = pd.to_datetime(df["Month"], format = "%Y-%m")
+
+    passengers = df["#Passengers"]
+    plt.figure(figsize=(10, 6))
+    plt.plot(df["Month"], passengers, label="#Passengers")
+    plt.xlabel("Month")
+    plt.ylabel("#Passengers")
+    plt.title("Passengers vs Time")
+    plt.legend()
+
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%B %Y"))
+    plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=15))
+    plt.xticks(rotation=25)
+    plt.show()
+
+    utils.cal_rolling_mean_var(df["#Passengers"], "#Passengers")
+    utils.ADF_Cal(df["#Passengers"], "#Passengers", thres)
+    utils.kpss_test(df["#Passengers"], "#Passengers", thres)
+
+
+
+
+
+
+
+
+
+
 
     
 
