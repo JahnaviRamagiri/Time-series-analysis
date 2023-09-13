@@ -24,10 +24,18 @@ import utils
 if __name__ == '__main__':
     file_path = utils.get_file_path("tute1.csv")
 
-    # Question 1
-    # Plot Sales, AdBudget and GPD versus time step in one graph. Add grid and appropriate
+    # Question 1: Plot Sales, AdBudget and GPD versus time step in one graph. Add grid and appropriate
     # title, legend to each plot. The x-axis is the time, and it should show the time (year).
-    pd.read_csv(file_path)
+    df = pd.read_csv(file_path)
+    print(df.head())
+    utils.plot_data(df)
+    
+    # Question 2: Find the time series statistics (average, variance, standard deviation, median) of Sales, AdBudget
+    # and GPD
+    utils.get_statistics(df)
+
+    # Question 3: Prove that the Sales, AdBudget and GDP in this time series dataset is stationary.
+
     
 
 
