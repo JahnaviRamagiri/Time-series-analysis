@@ -14,13 +14,8 @@ solution. A report that includes the solution to all questions is required and w
 E. The python file must regenerate the provided results inside the report.
 """
 
-
-import matplotlib.pyplot as plt
 import pandas as pd
-import matplotlib.dates as mdates
-from statsmodels.tsa.stattools import adfuller
-import os
-import utils
+from LAB4 import utils
 
 if __name__ == '__main__':
     file_path = utils.get_file_path("tute1.csv")
@@ -29,11 +24,12 @@ if __name__ == '__main__':
     # title, legend to each plot. The x-axis is the time, and it should show the time (year).
     df = pd.read_csv(file_path)
     print(df.head())
-    utils.plot_data(df)
+    df["Date"] = pd.to_datetime(df["Date"], format="%m/%d/%Y")
+    utils.plot_graph(df, df.columns, "Date", 1, "USD($)", "Sales, AdBudget, GDP vs Time")
 
     # Question 2: Find the time series statistics (average, variance, standard deviation, median) of Sales, AdBudget
     # and GPD
-    utils.get_statistics(df)
+    utils.get_statistics(df, df.columns)
 
     # Question 3: Prove that the Sales, AdBudget and GDP in this time series dataset is stationary.
     utils.cal_rolling_mean_var(df["Sales"], "Sales")
@@ -52,39 +48,24 @@ if __name__ == '__main__':
     utils.kpss_test(df["GDP"], "GDP", thres)
 
     # Question 7: "AirPassengers.csv
-    file_path = utils.get_file_path("AirPassengers.csv")
+    file_path = utils.get_file_path("../In-class/AirPassengers.csv")
     df = pd.read_csv(file_path)
     print(df.head())
     df["Month"] = pd.to_datetime(df["Month"], format = "%Y-%m")
+    utils.plot_graph(df, df.columns, "Month", 20, "#Passengers", "#Passengers vs Time")
+    utils.get_statistics(df, df.columns)
+    utils.check_stationarity(df["#Passengers"], "#Passengers", thres=0.05)
 
-    passengers = df["#Passengers"]
-    plt.figure(figsize=(10, 6))
-    plt.plot(df["Month"], passengers, label="#Passengers")
-    plt.xlabel("Month")
-    plt.ylabel("#Passengers")
-    plt.title("Passengers vs Time")
-    plt.legend()
+    # Question 8
+    df["First Diff"] = utils.get_differencing(df["#Passengers"])
+    utils.check_stationarity(df["First Diff"], "First Order Differencing", thres=0.05, order=1)
+    df["Second Diff"] = utils.get_differencing(df["First Diff"])
+    utils.check_stationarity(df["Second Diff"], "Second Order Differencing", thres=0.05, order=2)
+    df["Third Diff"] = utils.get_differencing(df["Second Diff"])
+    utils.check_stationarity(df["Third Diff"], "Third Order Differencing", thres=0.05, order=3)
 
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%B %Y"))
-    plt.gca().xaxis.set_major_locator(mdates.MonthLocator(interval=15))
-    plt.xticks(rotation=25)
-    plt.show()
-
-    utils.cal_rolling_mean_var(df["#Passengers"], "#Passengers")
-    utils.ADF_Cal(df["#Passengers"], "#Passengers", thres)
-    utils.kpss_test(df["#Passengers"], "#Passengers", thres)
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
+    # Log Transform
+    df["Log Transform"] = utils.get_log_transform(df["#Passengers"])
+    df["First Diff Log Transform"] = utils.get_differencing(df["Log Transform"])
+    utils.check_stationarity(df["First Diff Log Transform"], "First Diff Log Transform", thres=0.05, order = 1)
 
