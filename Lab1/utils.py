@@ -684,4 +684,3 @@ def plot_variable_graph(df, target, x_label, y_label, title, sample_size = 100):
 
 def get_mean_var(y_list):
     return [np.mean(y) for y in y_list], [np.var(y) for y in y_list]
-
