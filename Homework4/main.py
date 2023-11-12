@@ -1,5 +1,5 @@
 import pandas as pd
-from Lab1 import utils
+from modules import utils
 
 if __name__ == '__main__':
     # 𝑦(𝑡) − 0.5𝑦(𝑡 − 1) − 0.2𝑦(𝑡 − 2) = 𝑒(𝑡)

@@ -1,8 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from Lab1 import utils
 import numpy as np
 import seaborn as sns
+
+from modules import plot
+from modules import utils
+from modules import arma
+from modules import simple_forecasting_methods as sfm
+from modules import statistics as st
 
 if __name__ == '__main__':
     """
@@ -35,7 +40,6 @@ if __name__ == '__main__':
 
 
     utils.print_title("Preprocessing Dataset")
-
     date_range = pd.date_range(start='2004-03-10 18:00:00', periods=len(df), freq='h')
     df.index = date_range
     utils.print_title("Handling Null values", "~")
@@ -51,13 +55,13 @@ if __name__ == '__main__':
     print(df.isna().sum())
 
     utils.print_title("Plot Target Variable", "~")
-    utils.plot_variable_graph(df, "CO(GT)", "Time", "CO(GT) in mg/m^3", "CO(GT) vs Time", 200)
+    plot.plot_variable_graph(df, "CO(GT)", "Time", "CO(GT) in mg/m^3", "CO(GT) vs Time", 200)
     utils.print_observation("The Data Shows sudden spikes to -200, as the missing values in the dataset are represented by -200. These need to handled.")
 
     df.replace(to_replace=-200, value=np.nan, inplace=True)
     # utils.print_title("Plot Target Variable", "~")
-    utils.plot_graph(df, df.columns, "Time", 1, "Features", "Features vs Time", 200)
-    utils.plot_variable_graph(df, "CO(GT)", "Time", "CO(GT) in mg/m^3", "CO(GT) vs Time", 200)
+    plot.plot_graph(df, df.columns, "Time", 1, "Features", "Features vs Time", 200)
+    plot.plot_variable_graph(df, "CO(GT)", "Time", "CO(GT) in mg/m^3", "CO(GT) vs Time", 200)
 
     utils.print_title("Plot Missing Values", "~")
     plt.figure(figsize=(12, 15))
@@ -72,10 +76,10 @@ if __name__ == '__main__':
     for i in df.columns:
         df[i] = df[i].fillna(df[i].mean())
     print(df.isna().sum())
-    utils.plot_variable_graph(df, "CO(GT)", "Time", "CO(GT) in mg/m^3", "CO(GT) vs Time After Handling Missing Values", 200)
+    plot.plot_variable_graph(df, "CO(GT)", "Time", "CO(GT) in mg/m^3", "CO(GT) vs Time After Handling Missing Values", 200)
 
     utils.print_title("Plot Auto Correlation function", "~")
-    target_acf = utils.auto_corr_func(df["CO(GT)"], 25, title="ACF CO(GT)", plot=True)
+    target_acf = st.auto_corr_func(df["CO(GT)"], 25, title="ACF CO(GT)", plot=True)
     print(target_acf)
     # TODO: Write ACF Observations.
 
@@ -94,5 +98,5 @@ if __name__ == '__main__':
     # print(train_set.shape, test_set.shape)
 
     utils.print_title("Stationarity".upper(), "*", 30, 2)
-    utils.ADF_Cal(df["CO(GT)"], "CO(GT)")
-    utils.kpss_test(df["CO(GT)"], "CO(GT)")
+    st.ADF_Cal(df["CO(GT)"], "CO(GT)")
+    st.kpss_test(df["CO(GT)"], "CO(GT)")
