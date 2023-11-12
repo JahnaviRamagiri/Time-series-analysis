@@ -7,15 +7,15 @@ from statsmodels.tsa.stattools import adfuller, kpss
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 import statsmodels.api as sm
 import math
+from scipy import signal
 import warnings
 
 warnings.filterwarnings("ignore")
 # warnings.filterwarnings("ignore", category=FutureWarning)
 
 
-def print_title(title):
-    print("\n")
-    print(20 * "*", title, 20 * "*")
+def print_title(title, pattern = "*", pattern_length = 20, num_blank_lines = 1):
+    print((num_blank_lines//2 + 1 )* "\n", pattern_length * pattern, title, pattern_length * pattern, num_blank_lines//2 * "\n")
 
 
 def get_file_path(file_name):
@@ -51,14 +51,14 @@ def plot_data(df):
     plt.show()
 
 
-def plot_graph(df, col_list, x_label, x_interval, y_label, title):
-    x_col = df[col_list[0]]
+def plot_graph(df, col_list, x_label, x_interval, y_label, title, sample_size):
+    x_col = df.index
 
     # Plot Data
     plt.figure(figsize = (10,6))
 
-    for col in col_list[1:]:
-        plt.plot(x_col, df[col], label=col)
+    for col in col_list:
+        plt.plot(x_col[:sample_size], df[col][:sample_size], label=col)
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -224,11 +224,11 @@ def auto_corr_func(data, max_lag, title = "ACF", plot = True):
         plt.setp(markers, color = 'red', marker = 'o')
         plt.setp(baseline, color='grey', linewidth=2, linestyle='-')
         m = 1.96/np.sqrt(n)
-        print("m", m)
+        # print("m", m)
         plt.axhspan(-m, m,alpha = 0.2, color = 'blue')
         plt.xlabel("Lags")
         plt.ylabel("Magnitude")
-        plt.xticks(lags)
+        # plt.xticks(lags)
         plt.title(title)
         # plt.grid()
         plt.show()
@@ -601,21 +601,87 @@ def cal_partial_correlation(rxy, ryz, rxz):
 
 # def cal_stat_significance(ry)
 
+def cal_AR(a, method,  T = 100, mean = 0, var = 1):
+    """
+
+    :param a: AR coefficients starting from y(t-1)
+    :param T: No. Of Samples
+    :param mean: Mean of White Noise
+    :param var: Variance of White Noise
+    :return: Time Series Y
+
+    Prints mean and variance of the time series
+    """
+    e = np.random.normal(mean, var, T)
+    y = np.zeros(len(e))
+    an = len(a)
+
+    # Hardcoding it to y(t) - 0.5y(t-1) - 0.2y(t-2) = e(t)
+
+    for t in range(len(e)):
+        if t== 0:
+            y[t]=e[t]
+
+        elif t == 1:
+            y[t] = e[t] + 0.5 * y[t-1]
+
+        else:
+            y[t] = e[t] + 0.5 * y[t-1] + 0.2 * y[t-2]
+
+    print(f"Equation for {T, mean, var}")
+    print(f'Sampled mean is {np.mean(y)}')
+    print(f'Sampled var is {np.var(y)}')
+    plt.plot(y)
+    plt.show()
+
+    return y
+
+def get_arma(num, den, T, mean, var, title = ""):
+
+    e = np.random.normal(mean, var, T)
+    sys = (num, den, 1)
+    _, y = signal.dlsim(sys, e)
+    # print('for loop simulation', y[:5])
+    y = np.ndarray.flatten(y)
+
+    date_range = pd.date_range(start="01-01-2000", periods = len(y), freq='D')
+    df = pd.DataFrame(y, index = date_range)
+
+    print(f"Equation for {T, mean, var}")
+    print(f'Sampled mean is {np.mean(y)}')
+    print(f'Sampled var is {np.var(y)}')
+
+    plot_variable_graph(df, 0, "Time", "Y", title, sample_size=100)
+    # plt.plot(df)
+    # plt.show()
+
+    return y
 
 
+def get_df_info(df, title):
+    print_title(title, pattern="-", pattern_length=10)
+    print("The Data Frame Contains Columns", list(df.columns))
+    print("Size of the Data Frame", df.shape)
+    print(df.head())
 
 
+def print_observation(text):
+    print("OBSERVATION: ", text)
 
 
+def plot_variable_graph(df, target, x_label, y_label, title, sample_size = 100):
+    # Plot Data
+    plt.figure(figsize = (10,6))
+    plt.plot(df.index[:sample_size], df[target][:sample_size], label=target)
+
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.grid(True)
+    plt.title(title)
+    plt.legend()
+    plt.show()
 
 
-
-
-
-
-
-
-
-
-
+def get_mean_var(y_list):
+    return [np.mean(y) for y in y_list], [np.var(y) for y in y_list]
 
