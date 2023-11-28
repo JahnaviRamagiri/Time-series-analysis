@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import warnings
 
-import simple_forecasting_methods as sfm
-import arma
+from modules import simple_forecasting_methods as sfm, arma
 
 warnings.filterwarnings("ignore")
 

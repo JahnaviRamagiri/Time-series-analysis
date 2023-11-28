@@ -3,11 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from modules import plot
-from modules import utils
-from modules import arma
-from modules import simple_forecasting_methods as sfm
-from modules import statistics as st
+from modules import statistics as st, plot, utils
 
 if __name__ == '__main__':
     """

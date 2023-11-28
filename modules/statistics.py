@@ -3,11 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller, kpss
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.graphics.tsaplots import plot_acf , plot_pacf
 import statsmodels.api as sm
 
 import warnings
-import plot
-import utils
+from modules import utils, plot
 
 warnings.filterwarnings("ignore")
 
@@ -329,3 +329,68 @@ def standardize_dataset(dataset):
     for row in dataset:
         for i in range(len(row)):
             row[i] = (row[i] - means[i]) / stdevs[i]
+
+
+def cal_autocovariance(y, lag):
+    cov = 0
+    return cov
+
+
+def get_gpac_phi(ry, j, k):
+    # TODO: Create Num Array
+    # num = 0
+    # TODO: Create Den Array
+    den = np.zeros((k,k))
+    den_idx = np.zeros((k, k))
+    # c_array = [ry[i] for i in range(j, j+k)]
+    # for i in range(k):
+    #         den[i, :] = np.roll(c_array, i)
+
+    mid = len(ry)//2
+    for i in range(k):
+            den[:, i] = ry[mid+j-i:mid+j+k-i]
+            # den_idx[:, i] = np.array([range(j-i, j+k-i)])
+
+    num_array = [ry[i] for i in range(mid+j+1, mid+j+k+1)]
+    # num_array_idx = np.array([range(j + 1, j + k + 1)])
+    num = np.copy(den)
+    num[:, -1] =  num_array
+
+    # num_idx = np.copy(den_idx)
+    # num_idx[:, -1] = num_array_idx
+
+    # print(f"j = {j} , k = {k}")
+    # print(np.array(num_idx))
+    # print(np.array(num_array_idx))
+    # print(np.array(den_idx))
+
+    phi_num = np.linalg.det(np.array(num))
+    phi_den = np.linalg.det(np.array(den))
+
+    return round(phi_num/phi_den, 2)
+
+
+def get_gpac(ry, j=7, k=7):
+
+    gpac_array = np.zeros((j, k-1))
+
+    for j_ in range(j):
+        for k_ in range(1,k):
+            gpac_array[j_, k_-1] = get_gpac_phi(ry, j_, k_)
+
+    return gpac_array
+
+
+def ACF_PACF_Plot(y,lags):
+    acf = sm.tsa.stattools.acf(y, nlags=lags)
+    pacf = sm.tsa.stattools.pacf(y, nlags=lags)
+    fig = plt.figure()
+    plt.subplot(211)
+    plt.title('ACF/PACF of the raw data')
+    plot_acf(y, ax=plt.gca(), lags=lags)
+    plt.subplot(212)
+    plot_pacf(y, ax=plt.gca(), lags=lags)
+    fig.tight_layout(pad=3)
+    plt.show()
+
+# def get_LM()

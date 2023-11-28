@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
 import warnings
-import plot
+from modules import plot
+import statsmodels.api as sm
 
 warnings.filterwarnings("ignore")
 
@@ -103,3 +104,18 @@ def get_arma(num, den, T, mean, var, title = ""):
 #         print(ma)
 #
 #     return ma
+
+def get_process(an,bn):
+
+    arparams = np.array(an)
+    maparams = np.array(bn)
+
+    ar = np.r_[1, arparams]
+    ma = np.r_[1, maparams]
+
+    arma_process = sm.tsa.ArmaProcess(ar, ma)
+
+    return arma_process
+
+
+
